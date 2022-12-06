@@ -23,7 +23,6 @@ class Plugin:
         """
         return {
             'docker': InfrastructureTarget(
-                'docker',
                 fatman_deployer=DockerFatmanDeployer(),
                 fatman_monitor=DockerMonitor(),
                 logs_streamer=DockerLogsStreamer(),
