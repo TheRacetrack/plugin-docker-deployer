@@ -143,6 +143,7 @@ class DockerJobDeployer(JobDeployer):
                          job_version: str,
                          job_secrets: JobSecrets,
                          ):
+        logger.warning('saving secrets in an ephemeral, in-memory store')
         self._secrets_store[f'{job_name}.{job_version}'] = job_secrets
 
     def get_job_secrets(self,
