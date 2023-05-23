@@ -1,2 +1,4 @@
 *.zip
 /venv
+.idea
+.vscode

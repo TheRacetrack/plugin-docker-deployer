@@ -26,8 +26,9 @@ logger = get_logger(__name__)
 class DockerJobDeployer(JobDeployer):
     """JobDeployer managing workloads on a local docker instance, used mostly for testing purposes"""
 
-    def __init__(self) -> None:
+    def __init__(self, secrets_store: dict[str, JobSecrets]) -> None:
         self.infrastructure_name = 'docker'
+        self._secrets_store: dict[str, JobSecrets] = secrets_store
 
     def deploy_job(
         self,
@@ -138,16 +139,20 @@ class DockerJobDeployer(JobDeployer):
         return 8000
 
     def save_job_secrets(self,
-                            job_name: str,
-                            job_version: str,
-                            job_secrets: JobSecrets,
-                            ):
-        raise NotImplementedError("managing secrets is not supported on local docker")
+                         job_name: str,
+                         job_version: str,
+                         job_secrets: JobSecrets,
+                         ):
+        logger.warning('saving secrets in an ephemeral, in-memory store')
+        self._secrets_store[f'{job_name}.{job_version}'] = job_secrets
 
     def get_job_secrets(self,
-                           job_name: str,
-                           job_version: str,
-                           ) -> JobSecrets:
+                        job_name: str,
+                        job_version: str,
+                        ) -> JobSecrets:
+        key = f'{job_name}.{job_version}'
+        if key in self._secrets_store:
+            return self._secrets_store[key]
         raise NotImplementedError("managing secrets is not supported on local docker")
 
     @staticmethod
