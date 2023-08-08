@@ -1,17 +1,15 @@
 from __future__ import annotations
-import sys
 from typing import Any
 
 from racetrack_client.log.logs import get_logger
+from lifecycle.deployer.infra_target import InfrastructureTarget
+from lifecycle.deployer.secrets import JobSecrets
 
-if 'lifecycle' in sys.modules:
-    from lifecycle.deployer.infra_target import InfrastructureTarget
-    from lifecycle.deployer.secrets import JobSecrets
-    from deployer import DockerJobDeployer
-    from monitor import DockerMonitor
-    from logs_streamer import DockerLogsStreamer
+from deployer import DockerJobDeployer
+from monitor import DockerMonitor
+from logs_streamer import DockerLogsStreamer
 
-    secrets_store: dict[str, JobSecrets] = {}
+secrets_store: dict[str, JobSecrets] = {}
 
 logger = get_logger(__name__)
 
