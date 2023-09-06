@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing import Any
 
 from racetrack_client.log.logs import get_logger
