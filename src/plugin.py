@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Any
 
 from racetrack_client.log.logs import get_logger
-from lifecycle.deployer.infra_target import InfrastructureTarget
+from lifecycle.infrastructure.model import InfrastructureTarget
 from lifecycle.deployer.secrets import JobSecrets
 
 from deployer import DockerJobDeployer
@@ -19,7 +19,7 @@ class Plugin:
     def infrastructure_targets(self) -> dict[str, Any]:
         """
         Infrastructure Targets (deployment targets) for Jobs provided by this plugin
-        :return dict of infrastructure name -> an instance of lifecycle.deployer.infra_target.InfrastructureTarget
+        :return dict of infrastructure name -> an instance of InfrastructureTarget
         """
         return {
             'docker': InfrastructureTarget(
