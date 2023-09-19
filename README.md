@@ -7,3 +7,8 @@ A Racetrack plugin allowing to deploy services to a local Docker
 1.  Install `racetrack` client and generate ZIP plugin by running `make bundle`.
 
 2.  Activate the plugin in Racetrack Dashboard Admin page by uploading the zipped plugin file.
+
+or install the latest plugin with:
+```sh
+racetrack plugin install github.com/TheRacetrack/plugin-docker-infrastructure
+```
