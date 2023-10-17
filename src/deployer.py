@@ -12,7 +12,6 @@ from racetrack_client.log.logs import get_logger
 from racetrack_client.manifest import Manifest
 from racetrack_client.utils.shell import shell, shell_output
 from racetrack_client.utils.time import datetime_to_timestamp, now
-from racetrack_commons.api.debug import is_deployment_local
 from racetrack_commons.api.tracing import get_tracing_header_name
 from racetrack_commons.deploy.image import get_job_image
 from racetrack_commons.deploy.resource import job_resource_name
@@ -44,7 +43,6 @@ class DockerJobDeployer(JobDeployer):
         if self.job_exists(manifest.name, manifest.version):
             self.delete_job(manifest.name, manifest.version)
 
-        job_port = self._get_next_job_port()
         entrypoint_resource_name = job_resource_name(manifest.name, manifest.version)
         deployment_timestamp = datetime_to_timestamp(now())
         family_model = read_job_family_model(family.name)
@@ -77,12 +75,10 @@ class DockerJobDeployer(JobDeployer):
 
             container_name = self.get_container_name(entrypoint_resource_name, container_index)
             image_name = get_job_image(config.docker_registry, config.docker_registry_namespace, manifest.name, tag, container_index)
-            ports_mapping = f'-p {job_port}:{JOB_INTERNAL_PORT}' if container_index == 0 else ''
 
             shell(
                 f'docker run -d'
                 f' --name {container_name}'
-                f' {ports_mapping}'
                 f' {env_vars_cmd}'
                 f' --pull always'
                 f' --network="racetrack_default"'
@@ -99,7 +95,7 @@ class DockerJobDeployer(JobDeployer):
             create_time=deployment_timestamp,
             update_time=deployment_timestamp,
             manifest=manifest,
-            internal_name=self.job_internal_name(entrypoint_resource_name, str(job_port)),
+            internal_name=f'{entrypoint_resource_name}:{JOB_INTERNAL_PORT}',
             image_tag=tag,
             infrastructure_target=self.infrastructure_name,
         )
@@ -154,13 +150,6 @@ class DockerJobDeployer(JobDeployer):
         if key in self._secrets_store:
             return self._secrets_store[key]
         raise NotImplementedError("managing secrets is not supported on local docker")
-
-    @staticmethod
-    def job_internal_name(resource_name: str, job_port: str):
-        if is_deployment_local():
-            return f'localhost:{job_port}'
-        else:
-            return f'{resource_name}:{JOB_INTERNAL_PORT}'
 
     @staticmethod
     def get_container_name(resource_name: str, container_index: int) -> str:
