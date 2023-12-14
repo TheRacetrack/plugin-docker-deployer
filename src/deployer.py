@@ -38,6 +38,7 @@ class DockerJobDeployer(JobDeployer):
         runtime_env_vars: Dict[str, str],
         family: JobFamilyDto,
         containers_num: int = 1,
+        runtime_secret_vars: Dict[str, str] | None = None,
     ) -> JobDto:
         """Run Job as docker container on local docker"""
         if self.job_exists(manifest.name, manifest.version):
@@ -61,6 +62,7 @@ class DockerJobDeployer(JobDeployer):
         if containers_num > 1:
             common_env_vars['JOB_USER_MODULE_HOSTNAME'] = self.get_container_name(entrypoint_resource_name, 1)
 
+        runtime_env_vars = merge_env_vars(runtime_env_vars, runtime_secret_vars)
         conflicts = common_env_vars.keys() & runtime_env_vars.keys()
         if conflicts:
             raise RuntimeError(f'found illegal runtime env vars, which conflict with reserved names: {conflicts}')
